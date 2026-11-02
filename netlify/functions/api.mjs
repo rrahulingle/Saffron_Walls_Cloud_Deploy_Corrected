@@ -1,4 +1,4 @@
-import { getStore } from '@netlify/blobs';
+import { getStore, connectLambda } from '@netlify/blobs';
 import crypto from 'node:crypto';
 
 // Create the Blobs store lazily when a request is being handled.
@@ -213,6 +213,8 @@ function bodyOf(event) {
 }
 
 export async function handler(event) {
+    connectLambda(event);
+
   const method = event.httpMethod || 'GET';
 
   let path = event.path || '/';
