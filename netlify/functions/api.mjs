@@ -1,11 +1,29 @@
 import { getStore } from '@netlify/blobs';
 import crypto from 'node:crypto';
 
-const store = () =>
-  getStore({
+// Create the Blobs store lazily when a request is being handled.
+// Netlify normally injects Blobs credentials into supported Functions runtimes.
+// Explicit environment-variable fallbacks also support runtimes where automatic
+// credential injection is unavailable.
+function store() {
+  const siteID = process.env.NETLIFY_SITE_ID;
+  const token =
+    process.env.NETLIFY_BLOBS_TOKEN ||
+    process.env.NETLIFY_AUTH_TOKEN;
+
+  const options = {
     name: 'saffron-walls-data',
     consistency: 'strong'
-  });
+  };
+
+  // Pass explicit credentials only when both are configured.
+  if (siteID && token) {
+    options.siteID = siteID;
+    options.token = token;
+  }
+
+  return getStore(options);
+}
 
 const ADMIN_USER = process.env.ADMIN_USER || 'admin';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
@@ -593,4 +611,3 @@ export async function handler(event) {
     });
   }
 }
-
