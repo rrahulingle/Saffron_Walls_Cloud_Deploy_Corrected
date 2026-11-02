@@ -1,4 +1,3 @@
-```javascript
 import { getStore } from '@netlify/blobs';
 import crypto from 'node:crypto';
 
